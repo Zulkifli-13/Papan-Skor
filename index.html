@@ -4,230 +4,273 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Papan Skor Badminton & Tenis Meja</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Papan Skor">
+    
+    <!-- Embedded Inline Web App Manifest for Offline PWA Installation -->
+    <link rel="manifest" id="manifestPlaceholder">
+
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        /* Base Resets & Typography using Android system fonts */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             user-select: none;
             -webkit-user-select: none;
             touch-action: manipulation;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
+
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Score Typography */
         .font-score {
-            font-family: 'Teko', sans-serif;
+            font-family: Impact, 'Arial Black', sans-serif;
             line-height: 0.85;
+            letter-spacing: -2px;
+        }
+
+        /* Orientation Warning Overlay for Portrait Mode */
+        .portrait-warning {
+            display: none;
         }
         @media screen and (orientation: portrait) {
             .portrait-warning {
                 display: flex !important;
             }
         }
+
+        /* Interactive Animations & Effects */
         .score-card {
-            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            transition: transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .score-card:active {
-            transform: scale(0.98);
+            transform: scale(0.985);
         }
         .glow-emerald {
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
-        }
-        .glow-indigo {
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.15);
         }
         .glow-red {
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 35px rgba(239, 68, 68, 0.15);
         }
+        .glow-amber {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Custom Utility Classes equivalent to Tailwind */
+        .flex-col { flex-direction: column; }
+        .flex-row { flex-direction: row; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .flex-1 { flex: 1; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .hidden { display: none !important; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 h-screen w-screen overflow-hidden select-none">
+<body>
 
-    <!-- PORTRAIT WARNING MODAL -->
-    <div class="portrait-warning hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex-col items-center justify-center p-6 text-center">
-        <div class="w-16 h-16 mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 animate-bounce">
-            <i data-lucide="rotate-cw" class="w-8 h-8"></i>
+    <!-- PORTRAIT ORIENTATION WARNING OVERLAY -->
+    <div class="portrait-warning fixed inset-0 z-50 bg-slate-950/95 backdrop-blur flex-col items-center justify-center p-6 text-center" style="position:fixed; inset:0; z-index:99; background:#020617; display:none; flex-direction:column; align-items:center; justify-center:center; padding:1.5rem; text-align:center;">
+        <div style="width:64px; height:64px; margin-bottom:1rem; border-radius:1rem; background:rgba(245, 158, 11, 0.1); border:1px solid rgba(245, 158, 11, 0.3); display:flex; align-items:center; justify-content:center; color:#fbbf24;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
         </div>
-        <h2 class="text-2xl font-bold text-white mb-2">Putar Perangkat Ke Lanskap</h2>
-        <p class="text-slate-400 max-w-xs text-sm leading-relaxed">
-            Aplikasi ini didesain khusus untuk tampilan **Landscape** agar tombol skor luas dan nyaman ditap saat pertandingan.
+        <h2 style="font-size:1.5rem; font-weight:800; color:#ffffff; margin-bottom:0.5rem;">Putar HP Ke Lanskap</h2>
+        <p style="color:#94a3b8; max-width:280px; font-size:0.875rem; line-height:1.4;">
+            Aplikasi papan skor ini didesain khusus mode **Landscape** agar tombol tap poin berukuran ekstra besar & mudah ditekan.
         </p>
     </div>
 
-    <!-- MAIN APP WRAPPER -->
-    <div id="app" class="h-full w-full flex flex-col justify-between p-2 md:p-3 relative overflow-hidden">
+    <!-- MAIN APP LANDSCAPE LAYOUT CONTAINER -->
+    <div id="app" style="height:100vh; width:100vw; display:flex; flex-direction:column; justify-content:space-between; padding:0.5rem; position:relative;">
         
         <!-- HEADER TOP BAR -->
-        <header class="flex items-center justify-between bg-slate-900/90 border border-slate-800 rounded-2xl px-3 py-2 shrink-0 gap-2 backdrop-blur-md">
+        <header style="display:flex; align-items:center; justify-content:space-between; background:rgba(15, 23, 42, 0.9); border:1px solid #1e293b; border-radius:1rem; padding:0.5rem 0.75rem; shrink:0; gap:0.5rem;">
             
-            <!-- Sport Mode Switcher -->
-            <div class="flex items-center gap-2">
-                <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
-                    <button id="btnBadminton" onclick="switchSport('badminton')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-900/40">
-                        <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+            <!-- Sport Selector & Match Set Badge -->
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <div style="display:flex; background:#020617; padding:0.25rem; border-radius:0.75rem; border:1px solid #1e293b;">
+                    <button id="btnBadminton" onclick="switchSport('badminton')" style="display:flex; align-items:center; gap:0.35rem; padding:0.35rem 0.75rem; border-radius:0.5rem; font-size:0.75rem; font-weight:800; border:none; cursor:pointer; background:#059669; color:#ffffff; box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
                         <span>Badminton</span>
                     </button>
-                    <button id="btnTableTennis" onclick="switchSport('tableTennis')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200">
-                        <i data-lucide="disc" class="w-3.5 h-3.5"></i>
+                    <button id="btnTableTennis" onclick="switchSport('tableTennis')" style="display:flex; align-items:center; gap:0.35rem; padding:0.35rem 0.75rem; border-radius:0.5rem; font-size:0.75rem; font-weight:800; border:none; cursor:pointer; background:transparent; color:#94a3b8;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
                         <span>Tenis Meja</span>
                     </button>
                 </div>
 
-                <!-- Match Set Badge -->
-                <div class="hidden sm:flex items-center gap-2 bg-slate-950/70 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-                    <span class="text-slate-400 font-medium">Set Ke:</span>
-                    <span id="currentSetLabel" class="font-black text-amber-400">1</span>
-                    <span class="text-slate-600">|</span>
-                    <span id="matchRuleLabel" class="text-slate-300 font-semibold">Best of 3 (21 Poin)</span>
+                <div style="display:flex; align-items:center; gap:0.5rem; background:#020617; padding:0.35rem 0.75rem; border-radius:0.75rem; border:1px solid #1e293b; font-size:0.75rem;">
+                    <span style="color:#64748b; font-weight:600;">Set:</span>
+                    <span id="currentSetLabel" style="font-weight:900; color:#fbbf24;">1</span>
+                    <span style="color:#334155;">|</span>
+                    <span id="matchRuleLabel" style="color:#cbd5e1; font-weight:700;">Best of 3 (21 Poin)</span>
                 </div>
             </div>
 
-            <!-- Toolbar Action Buttons -->
-            <div class="flex items-center gap-1.5 sm:gap-2">
+            <!-- Header Action Controls -->
+            <div style="display:flex; align-items:center; gap:0.4rem;">
                 
                 <!-- WHISTLE HOLD BUTTON -->
-                <button id="btnWhistle" title="Tahan untuk membunyikan peluit panjang" class="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl transition flex items-center gap-1.5 active:scale-95 touch-none select-none">
-                    <i data-lucide="volume-2" class="w-4 h-4"></i>
-                    <span class="text-xs font-bold">Peluit (Tahan)</span>
+                <button id="btnWhistle" title="Tahan untuk membunyikan peluit" style="padding:0.4rem 0.75rem; background:rgba(245, 158, 11, 0.12); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.3); border-radius:0.75rem; cursor:pointer; display:flex; align-items:center; gap:0.35rem; font-size:0.75rem; font-weight:800;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <span>Peluit (Tahan)</span>
                 </button>
 
-                <!-- Voice TTS Toggle Button -->
-                <button id="btnTTS" onclick="toggleTTS()" title="Suara Poin" class="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-xl transition flex items-center gap-1.5 active:scale-95">
-                    <i id="ttsIcon" data-lucide="megaphone" class="w-4 h-4"></i>
-                    <span id="ttsLabel" class="text-xs font-bold hidden md:inline">Suara: ON</span>
+                <!-- Offline PWA Install Prompt Button -->
+                <button id="btnInstallPWA" onclick="installPWA()" style="display:none; padding:0.4rem 0.75rem; background:rgba(99, 102, 241, 0.15); color:#818cf8; border:1px solid rgba(99, 102, 241, 0.3); border-radius:0.75rem; cursor:pointer; align-items:center; gap:0.35rem; font-size:0.75rem; font-weight:800;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Simpan App</span>
                 </button>
 
-                <!-- Swap Sides -->
-                <button onclick="swapSides()" title="Tukar Tempat Pemain" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl transition active:scale-95">
-                    <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                <!-- Voice TTS Toggle -->
+                <button id="btnTTS" onclick="toggleTTS()" title="Suara Poin" style="padding:0.4rem 0.75rem; background:rgba(16, 185, 129, 0.12); color:#34d399; border:1px solid rgba(16, 185, 129, 0.3); border-radius:0.75rem; cursor:pointer; display:flex; align-items:center; gap:0.35rem; font-size:0.75rem; font-weight:800;">
+                    <svg id="ttsIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <span id="ttsLabel">Suara: ON</span>
                 </button>
 
-                <!-- Match History Modal -->
-                <button onclick="openHistoryModal()" title="Riwayat Pertandingan" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl transition active:scale-95">
-                    <i data-lucide="history" class="w-4 h-4"></i>
+                <!-- Swap Court Sides -->
+                <button onclick="swapSides()" title="Tukar Tempat Pemain" style="padding:0.4rem; background:#1e293b; color:#e2e8f0; border:1px solid #334155; border-radius:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
                 </button>
 
-                <!-- Settings Drawer Modal -->
-                <button onclick="openSettingsModal()" title="Pengaturan Pertandingan" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl transition active:scale-95">
-                    <i data-lucide="settings" class="w-4 h-4"></i>
+                <!-- History -->
+                <button onclick="openHistoryModal()" title="Riwayat Pertandingan" style="padding:0.4rem; background:#1e293b; color:#e2e8f0; border:1px solid #334155; border-radius:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </button>
 
-                <!-- Fullscreen Toggle -->
-                <button onclick="toggleFullscreen()" title="Layar Penuh" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl transition active:scale-95">
-                    <i data-lucide="maximize" class="w-4 h-4"></i>
+                <!-- Settings -->
+                <button onclick="openSettingsModal()" title="Pengaturan Pertandingan" style="padding:0.4rem; background:#1e293b; color:#e2e8f0; border:1px solid #334155; border-radius:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+                </button>
+
+                <!-- Fullscreen -->
+                <button onclick="toggleFullscreen()" title="Layar Penuh" style="padding:0.4rem; background:#1e293b; color:#e2e8f0; border:1px solid #334155; border-radius:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
                 </button>
             </div>
         </header>
 
-        <!-- MAIN SCOREBOARD CONTENT -->
-        <main class="flex-1 grid grid-cols-2 gap-2 md:gap-4 my-2 relative">
+        <!-- MAIN SCOREBOARD COURT VIEW -->
+        <main style="flex:1; display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin:0.4rem 0; position:relative;">
             
-            <!-- VS Central Indicator -->
-            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-                <div class="bg-slate-950/90 border-2 border-slate-700 text-slate-300 font-black text-xs md:text-sm px-3 py-1 rounded-full shadow-2xl tracking-widest uppercase">
+            <!-- Center VS Divider -->
+            <div style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); z-index:20; pointer-events:none;">
+                <div style="background:rgba(2, 6, 23, 0.95); border:2px solid #334155; color:#cbd5e1; font-weight:900; font-size:0.75rem; padding:0.25rem 0.75rem; border-radius:999px; letter-spacing:2px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
                     VS
                 </div>
             </div>
 
-            <!-- PLAYER 1 / TEAM 1 CARD -->
-            <div id="cardP1" class="score-card bg-slate-900/90 border-2 border-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-4 flex flex-col justify-between relative overflow-hidden glow-emerald">
+            <!-- TEAM 1 CARD -->
+            <div id="cardP1" class="score-card glow-emerald" style="background:rgba(15, 23, 42, 0.92); border:2px solid #1e293b; border-radius:1.5rem; padding:0.875rem; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;">
                 
-                <!-- Top Info Bar Team 1 -->
-                <div class="flex items-center justify-between z-10">
-                    <div class="flex items-center gap-2">
-                        <!-- Click to edit team name -->
-                        <button onclick="openNameEditModal('p1')" class="group flex items-center gap-2 hover:bg-slate-800/80 px-2.5 py-1 rounded-xl transition border border-transparent hover:border-slate-700 bg-slate-950/50">
-                            <span id="p1Name" class="font-extrabold text-base md:text-xl text-white truncate max-w-[130px] sm:max-w-[200px]">Tim 1</span>
-                            <i data-lucide="edit-3" class="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400"></i>
+                <!-- Top Card Bar -->
+                <div style="display:flex; align-items:center; justify-content:space-between; z-index:10;">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <button onclick="openNameEditModal('p1')" style="display:flex; align-items:center; gap:0.4rem; background:rgba(2, 6, 23, 0.6); padding:0.25rem 0.6rem; border-radius:0.75rem; border:1px solid #1e293b; color:#ffffff; cursor:pointer;">
+                            <span id="p1Name" style="font-weight:900; font-size:1.1rem; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Tim 1</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                         </button>
 
-                        <!-- Serve Badge Team 1 -->
-                        <div id="p1ServeBadge" class="flex items-center gap-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-bold animate-pulse">
-                            <i data-lucide="zap" class="w-3 h-3 fill-amber-400"></i>
+                        <!-- Serve Indicator -->
+                        <div id="p1ServeBadge" style="display:flex; align-items:center; gap:0.25rem; background:rgba(245, 158, 11, 0.2); border:1px solid rgba(245, 158, 11, 0.5); color:#fbbf24; padding:0.15rem 0.6rem; border-radius:999px; font-size:0.7rem; font-weight:800;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                             <span>SERVIS</span>
                         </div>
                     </div>
 
-                    <!-- Sets Won Badge Team 1 -->
-                    <div class="flex items-center gap-1.5 bg-slate-950 px-3 py-1 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Set:</span>
-                        <span id="p1Sets" class="text-base md:text-lg font-black text-amber-400">0</span>
+                    <div style="display:flex; align-items:center; gap:0.3rem; background:#020617; padding:0.25rem 0.6rem; border-radius:0.75rem; border:1px solid #1e293b;">
+                        <span style="font-size:0.65rem; color:#64748b; font-weight:800;">SET:</span>
+                        <span id="p1Sets" style="font-size:1.1rem; font-weight:900; color:#fbbf24;">0</span>
                     </div>
                 </div>
 
-                <!-- HUGE TAP AREA FOR INCREMENT SCORE TIM 1 -->
-                <div onclick="addPoint('p1')" class="flex-1 flex items-center justify-center cursor-pointer my-1 z-10 group active:scale-95 transition-transform">
-                    <span id="p1Score" class="font-score text-[120px] sm:text-[150px] md:text-[180px] lg:text-[210px] font-bold text-white tracking-tight drop-shadow-2xl transition-all group-hover:text-emerald-400">
+                <!-- HUGE TOUCH TAP AREA INCREMENT POINT TIM 1 -->
+                <div onclick="addPoint('p1')" style="flex:1; display:flex; align-items:center; justify-content:center; cursor:pointer; my:0.25rem; z-index:10;">
+                    <span id="p1Score" class="font-score" style="font-size: clamp(6rem, 25vw, 12rem); font-weight:900; color:#ffffff; text-shadow:0 10px 30px rgba(0,0,0,0.8);">
                         0
                     </span>
                 </div>
 
-                <!-- Bottom Bar Team 1 -->
-                <div class="flex items-center justify-between z-10 pt-2 border-t border-slate-800/80">
-                    <button onclick="minusPoint('p1')" title="Kurangi Poin" class="flex items-center gap-1 px-3 py-1.5 bg-slate-800/90 hover:bg-red-500/20 text-slate-300 hover:text-red-400 rounded-xl border border-slate-700 transition active:scale-95 text-xs font-bold">
-                        <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+                <!-- Bottom Card Bar -->
+                <div style="display:flex; align-items:center; justify-content:space-between; z-index:10; border-top:1px solid rgba(30, 41, 59, 0.8); padding-top:0.4rem;">
+                    <button onclick="minusPoint('p1')" title="Kurangi Poin" style="display:flex; align-items:center; gap:0.25rem; padding:0.35rem 0.6rem; background:#1e293b; color:#cbd5e1; border:1px solid #334155; border-radius:0.75rem; cursor:pointer; font-size:0.7rem; font-weight:800;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         <span>Kurang (-1)</span>
                     </button>
 
-                    <div class="flex items-center gap-2">
-                        <span id="p1DiffBadge" class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400">
+                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                        <span id="p1DiffBadge" style="font-size:0.7rem; font-weight:900; padding:0.25rem 0.6rem; border-radius:0.5rem; background:#020617; border:1px solid #1e293b; color:#94a3b8;">
                             SELISIH: 0
                         </span>
-                        <span id="p1PositionHint" class="text-[11px] text-slate-400 font-semibold bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 hidden sm:inline-block">
+                        <span id="p1PositionHint" style="font-size:0.65rem; color:#94a3b8; font-weight:700; background:#020617; padding:0.25rem 0.5rem; border-radius:0.5rem; border:1px solid #1e293b;">
                             Kanan (Genap)
                         </span>
                     </div>
                 </div>
             </div>
 
-            <!-- PLAYER 2 / TEAM 2 CARD -->
-            <div id="cardP2" class="score-card bg-slate-900/90 border-2 border-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-4 flex flex-col justify-between relative overflow-hidden">
+            <!-- TEAM 2 CARD -->
+            <div id="cardP2" class="score-card" style="background:rgba(15, 23, 42, 0.92); border:2px solid #1e293b; border-radius:1.5rem; padding:0.875rem; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;">
                 
-                <!-- Top Info Bar Team 2 -->
-                <div class="flex items-center justify-between z-10">
-                    <!-- Sets Won Badge Team 2 -->
-                    <div class="flex items-center gap-1.5 bg-slate-950 px-3 py-1 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Set:</span>
-                        <span id="p2Sets" class="text-base md:text-lg font-black text-amber-400">0</span>
+                <!-- Top Card Bar -->
+                <div style="display:flex; align-items:center; justify-content:space-between; z-index:10;">
+                    <div style="display:flex; align-items:center; gap:0.3rem; background:#020617; padding:0.25rem 0.6rem; border-radius:0.75rem; border:1px solid #1e293b;">
+                        <span style="font-size:0.65rem; color:#64748b; font-weight:800;">SET:</span>
+                        <span id="p2Sets" style="font-size:1.1rem; font-weight:900; color:#fbbf24;">0</span>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <!-- Serve Badge Team 2 -->
-                        <div id="p2ServeBadge" class="hidden flex items-center gap-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-bold animate-pulse">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <!-- Serve Indicator -->
+                        <div id="p2ServeBadge" class="hidden" style="display:flex; align-items:center; gap:0.25rem; background:rgba(245, 158, 11, 0.2); border:1px solid rgba(245, 158, 11, 0.5); color:#fbbf24; padding:0.15rem 0.6rem; border-radius:999px; font-size:0.7rem; font-weight:800;">
                             <span>SERVIS</span>
-                            <i data-lucide="zap" class="w-3 h-3 fill-amber-400"></i>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                         </div>
 
-                        <!-- Click to edit team name -->
-                        <button onclick="openNameEditModal('p2')" class="group flex items-center gap-2 hover:bg-slate-800/80 px-2.5 py-1 rounded-xl transition border border-transparent hover:border-slate-700 bg-slate-950/50">
-                            <span id="p2Name" class="font-extrabold text-base md:text-xl text-white truncate max-w-[130px] sm:max-w-[200px]">Tim 2</span>
-                            <i data-lucide="edit-3" class="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400"></i>
+                        <button onclick="openNameEditModal('p2')" style="display:flex; align-items:center; gap:0.4rem; background:rgba(2, 6, 23, 0.6); padding:0.25rem 0.6rem; border-radius:0.75rem; border:1px solid #1e293b; color:#ffffff; cursor:pointer;">
+                            <span id="p2Name" style="font-weight:900; font-size:1.1rem; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Tim 2</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                         </button>
                     </div>
                 </div>
 
-                <!-- HUGE TAP AREA FOR INCREMENT SCORE TIM 2 -->
-                <div onclick="addPoint('p2')" class="flex-1 flex items-center justify-center cursor-pointer my-1 z-10 group active:scale-95 transition-transform">
-                    <span id="p2Score" class="font-score text-[120px] sm:text-[150px] md:text-[180px] lg:text-[210px] font-bold text-white tracking-tight drop-shadow-2xl transition-all group-hover:text-indigo-400">
+                <!-- HUGE TOUCH TAP AREA INCREMENT POINT TIM 2 -->
+                <div onclick="addPoint('p2')" style="flex:1; display:flex; align-items:center; justify-content:center; cursor:pointer; my:0.25rem; z-index:10;">
+                    <span id="p2Score" class="font-score" style="font-size: clamp(6rem, 25vw, 12rem); font-weight:900; color:#ffffff; text-shadow:0 10px 30px rgba(0,0,0,0.8);">
                         0
                     </span>
                 </div>
 
-                <!-- Bottom Bar Team 2 -->
-                <div class="flex items-center justify-between z-10 pt-2 border-t border-slate-800/80">
-                    <div class="flex items-center gap-2">
-                        <span id="p2PositionHint" class="text-[11px] text-slate-400 font-semibold bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 hidden sm:inline-block">
+                <!-- Bottom Card Bar -->
+                <div style="display:flex; align-items:center; justify-content:space-between; z-index:10; border-top:1px solid rgba(30, 41, 59, 0.8); padding-top:0.4rem;">
+                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                        <span id="p2PositionHint" style="font-size:0.65rem; color:#94a3b8; font-weight:700; background:#020617; padding:0.25rem 0.5rem; border-radius:0.5rem; border:1px solid #1e293b;">
                             Kanan (Genap)
                         </span>
-                        <span id="p2DiffBadge" class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400">
+                        <span id="p2DiffBadge" style="font-size:0.7rem; font-weight:900; padding:0.25rem 0.6rem; border-radius:0.5rem; background:#020617; border:1px solid #1e293b; color:#94a3b8;">
                             SELISIH: 0
                         </span>
                     </div>
 
-                    <button onclick="minusPoint('p2')" title="Kurangi Poin" class="flex items-center gap-1 px-3 py-1.5 bg-slate-800/90 hover:bg-red-500/20 text-slate-300 hover:text-red-400 rounded-xl border border-slate-700 transition active:scale-95 text-xs font-bold">
-                        <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+                    <button onclick="minusPoint('p2')" title="Kurangi Poin" style="display:flex; align-items:center; gap:0.25rem; padding:0.35rem 0.6rem; background:#1e293b; color:#cbd5e1; border:1px solid #334155; border-radius:0.75rem; cursor:pointer; font-size:0.7rem; font-weight:800;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         <span>Kurang (-1)</span>
                     </button>
                 </div>
@@ -235,28 +278,29 @@
 
         </main>
 
-        <!-- FOOTER BOTTOM DISPLAY -->
-        <footer class="flex items-center justify-between bg-slate-900/90 border border-slate-800 rounded-2xl px-3 py-2 shrink-0 gap-2 backdrop-blur-md">
+        <!-- FOOTER BOTTOM DISPLAY BAR -->
+        <footer style="display:flex; align-items:center; justify-content:space-between; background:rgba(15, 23, 42, 0.9); border:1px solid #1e293b; border-radius:1rem; padding:0.5rem 0.75rem; shrink:0; gap:0.5rem;">
             
-            <!-- Point Lead Status Display -->
-            <div class="flex items-center gap-2 text-xs">
-                <span class="text-slate-400 font-bold uppercase text-[10px] tracking-wider hidden sm:inline">Status Selisih:</span>
-                <div id="pointLeadBadge" class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-amber-400 font-black text-xs sm:text-sm shadow-inner flex items-center gap-1.5">
-                    <i data-lucide="scale" class="w-4 h-4"></i>
-                    <span id="pointLeadText">SKOR SERI (0)</span>
+            <!-- Point Lead / Difference Status Badge -->
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span style="font-size:0.65rem; color:#64748b; font-weight:800; text-transform:uppercase; letter-spacing:1px;">Status Selisih:</span>
+                <div style="padding:0.35rem 0.75rem; border-radius:0.75rem; background:#020617; border:1px solid #1e293b; display:flex; align-items:center; gap:0.4rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
+                    <span id="pointLeadText" style="font-weight:900; font-size:0.8rem; color:#fbbf24;">SKOR SERI (0)</span>
                 </div>
             </div>
 
-            <!-- Footer Action Controls -->
-            <div class="flex items-center gap-2">
-                <button onclick="undoLastAction()" id="btnUndo" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 text-xs font-bold transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
-                    <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
+            <!-- Global Action Controls -->
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+                <!-- Undo Button -->
+                <button id="btnUndo" onclick="undoLastAction()" style="display:flex; align-items:center; gap:0.35rem; padding:0.4rem 0.75rem; background:#1e293b; color:#cbd5e1; border:1px solid #334155; border-radius:0.75rem; font-size:0.75rem; font-weight:800; cursor:pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
                     <span>Undo</span>
                 </button>
 
-                <!-- RESET GAME BUTTON -->
-                <button onclick="openResetConfirmModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl text-xs font-bold transition active:scale-95">
-                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <!-- Reset Game Button -->
+                <button onclick="openResetConfirmModal()" style="display:flex; align-items:center; gap:0.35rem; padding:0.4rem 0.875rem; background:rgba(239, 68, 68, 0.12); color:#f87171; border:1px solid rgba(239, 68, 68, 0.3); border-radius:0.75rem; font-size:0.75rem; font-weight:800; cursor:pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     <span>Reset Game</span>
                 </button>
             </div>
@@ -264,84 +308,70 @@
 
     </div>
 
-    <!-- MODAL: EDIT TEAM NAME -->
-    <div id="nameEditModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-5 shadow-2xl flex flex-col gap-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="user-edit" class="w-5 h-5 text-amber-400"></i>
-                    <h3 id="nameEditModalTitle" class="font-bold text-base text-white">Ubah Nama Tim</h3>
-                </div>
-                <button onclick="closeNameEditModal()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- MODAL 1: EDIT TEAM NAME -->
+    <div id="nameEditModal" class="hidden" style="position:fixed; inset:0; z-index:60; background:rgba(2, 6, 23, 0.85); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:1rem;">
+        <div style="background:#0f172a; border:1px solid #1e293b; width:100%; max-width:360px; border-radius:1.5rem; padding:1.25rem; display:flex; flex-direction:column; gap:1rem; box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+            <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #1e293b; padding-bottom:0.75rem;">
+                <h3 id="nameEditModalTitle" style="font-weight:800; font-size:1rem; color:#ffffff;">Ubah Nama Tim</h3>
+                <button onclick="closeNameEditModal()" style="background:none; border:none; color:#94a3b8; cursor:pointer;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Nama Baru:</label>
-                <input type="text" id="inputModalTeamName" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-bold text-sm focus:outline-none focus:border-amber-400" placeholder="Masukkan nama tim..." autofocus>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; margin-bottom:0.4rem;">Nama Baru:</label>
+                <input type="text" id="inputModalTeamName" style="width:100%; background:#020617; border:1px solid #334155; border-radius:0.75rem; padding:0.6rem 0.8rem; color:#ffffff; font-weight:800; font-size:0.9rem; outline:none;" placeholder="Masukkan nama tim..." autofocus>
             </div>
 
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeNameEditModal()" class="px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-700">
-                    Batal
-                </button>
-                <button onclick="saveNameFromModal()" class="px-4 py-2 bg-amber-500 text-slate-950 font-black rounded-xl text-xs hover:bg-amber-400 shadow-lg shadow-amber-500/20">
-                    Simpan Nama
-                </button>
+            <div style="display:flex; justify-content:flex-end; gap:0.5rem; padding-top:0.25rem;">
+                <button onclick="closeNameEditModal()" style="padding:0.5rem 1rem; background:#1e293b; color:#cbd5e1; font-weight:800; border-radius:0.75rem; border:none; cursor:pointer; font-size:0.75rem;">Batal</button>
+                <button onclick="saveNameFromModal()" style="padding:0.5rem 1.25rem; background:#f59e0b; color:#020617; font-weight:900; border-radius:0.75rem; border:none; cursor:pointer; font-size:0.75rem; box-shadow:0 4px 12px rgba(245,158,11,0.3);">Simpan Nama</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: RESET CONFIRMATION -->
-    <div id="resetModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-5 shadow-2xl flex flex-col items-center text-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center">
-                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+    <!-- MODAL 2: RESET CONFIRMATION -->
+    <div id="resetModal" class="hidden" style="position:fixed; inset:0; z-index:60; background:rgba(2, 6, 23, 0.85); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:1rem;">
+        <div style="background:#0f172a; border:1px solid #1e293b; width:100%; max-width:340px; border-radius:1.5rem; padding:1.25rem; display:flex; flex-direction:column; align-items:center; text-align:center; gap:0.875rem;">
+            <div style="width:48px; height:48px; border-radius:999px; background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.3); color:#f87171; display:flex; align-items:center; justify-content:center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
             <div>
-                <h3 class="font-bold text-lg text-white">Reset Seluruh Game?</h3>
-                <p class="text-xs text-slate-400 mt-1">Seluruh poin, set, dan posisi servis akan diulang kembali dari awal (0 - 0).</p>
+                <h3 style="font-weight:800; font-size:1.1rem; color:#ffffff;">Reset Seluruh Game?</h3>
+                <p style="font-size:0.75rem; color:#94a3b8; margin-top:0.25rem; line-height:1.4;">Seluruh poin, set, dan giliran servis akan diulang dari awal (0 - 0).</p>
             </div>
-            <div class="flex items-center gap-2 w-full pt-2">
-                <button onclick="closeResetConfirmModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold text-xs transition">
-                    Batal
-                </button>
-                <button onclick="confirmResetGame()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-red-900/40 transition">
-                    Ya, Reset Game
-                </button>
+            <div style="display:flex; align-items:center; gap:0.5rem; width:100%; padding-top:0.25rem;">
+                <button onclick="closeResetConfirmModal()" style="flex:1; padding:0.6rem; background:#1e293b; color:#cbd5e1; border-radius:0.75rem; border:none; font-weight:800; font-size:0.75rem; cursor:pointer;">Batal</button>
+                <button onclick="confirmResetGame()" style="flex:1; padding:0.6rem; background:#dc2626; color:#ffffff; border-radius:0.75rem; border:none; font-weight:900; font-size:0.75rem; cursor:pointer; box-shadow:0 4px 12px rgba(220,38,38,0.4);">Ya, Reset</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: SETTINGS -->
-    <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col gap-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="settings" class="w-5 h-5 text-amber-400"></i>
-                    <h3 class="font-bold text-lg text-white">Pengaturan Pertandingan</h3>
-                </div>
-                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- MODAL 3: MATCH SETTINGS -->
+    <div id="settingsModal" class="hidden" style="position:fixed; inset:0; z-index:60; background:rgba(2, 6, 23, 0.85); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:1rem;">
+        <div style="background:#0f172a; border:1px solid #1e293b; width:100%; max-width:420px; border-radius:1.5rem; padding:1.25rem; display:flex; flex-direction:column; gap:1rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #1e293b; padding-bottom:0.75rem;">
+                <h3 style="font-weight:800; font-size:1.1rem; color:#ffffff;">Pengaturan Pertandingan</h3>
+                <button onclick="closeSettingsModal()" style="background:none; border:none; color:#94a3b8; cursor:pointer;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
-            <div class="space-y-3 text-sm">
-                <div class="grid grid-cols-2 gap-3">
+            <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.75rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
                     <div>
-                        <label class="block text-slate-400 mb-1 font-semibold text-xs">Nama Tim 1:</label>
-                        <input type="text" id="settingP1Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-white font-semibold focus:outline-none focus:border-amber-500 text-xs" placeholder="Tim 1">
+                        <label style="display:block; color:#94a3b8; margin-bottom:0.25rem; font-weight:700;">Nama Tim 1:</label>
+                        <input type="text" id="settingP1Name" style="width:100%; background:#020617; border:1px solid #334155; border-radius:0.6rem; padding:0.5rem; color:#ffffff; font-weight:700; outline:none;" placeholder="Tim 1">
                     </div>
                     <div>
-                        <label class="block text-slate-400 mb-1 font-semibold text-xs">Nama Tim 2:</label>
-                        <input type="text" id="settingP2Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-white font-semibold focus:outline-none focus:border-amber-500 text-xs" placeholder="Tim 2">
+                        <label style="display:block; color:#94a3b8; margin-bottom:0.25rem; font-weight:700;">Nama Tim 2:</label>
+                        <input type="text" id="settingP2Name" style="width:100%; background:#020617; border:1px solid #334155; border-radius:0.6rem; padding:0.5rem; color:#ffffff; font-weight:700; outline:none;" placeholder="Tim 2">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-slate-400 mb-1 font-semibold text-xs">Target Poin Per Set:</label>
-                    <select id="settingTargetPoints" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-white font-semibold text-xs focus:outline-none focus:border-amber-500">
+                    <label style="display:block; color:#94a3b8; margin-bottom:0.25rem; font-weight:700;">Target Poin Per Set:</label>
+                    <select id="settingTargetPoints" style="width:100%; background:#020617; border:1px solid #334155; border-radius:0.6rem; padding:0.5rem; color:#ffffff; font-weight:700; outline:none;">
                         <option value="21">21 Poin (Standar Badminton)</option>
                         <option value="11">11 Poin (Standar Tenis Meja)</option>
                         <option value="15">15 Poin (Game Cepat)</option>
@@ -350,8 +380,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-slate-400 mb-1 font-semibold text-xs">Format Best of Sets:</label>
-                    <select id="settingMaxSets" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-white font-semibold text-xs focus:outline-none focus:border-amber-500">
+                    <label style="display:block; color:#94a3b8; margin-bottom:0.25rem; font-weight:700;">Format Set (Best of):</label>
+                    <select id="settingMaxSets" style="width:100%; background:#020617; border:1px solid #334155; border-radius:0.6rem; padding:0.5rem; color:#ffffff; font-weight:700; outline:none;">
                         <option value="3">Best of 3 Sets</option>
                         <option value="5">Best of 5 Sets</option>
                         <option value="1">1 Set Langsung</option>
@@ -359,80 +389,74 @@
                 </div>
 
                 <div>
-                    <label class="block text-slate-400 mb-1 font-semibold text-xs">Servis Pertama Pertandingan:</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button type="button" id="btnServerP1" onclick="setInitialServer('p1')" class="py-2 px-3 border border-amber-500 bg-amber-500/10 text-amber-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1 truncate">
+                    <label style="display:block; color:#94a3b8; margin-bottom:0.25rem; font-weight:700;">Servis Pertama Pertandingan:</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+                        <button type="button" id="btnServerP1" onclick="setInitialServer('p1')" style="padding:0.5rem; border:1px solid #f59e0b; background:rgba(245, 158, 11, 0.15); color:#fbbf24; font-weight:800; border-radius:0.6rem; cursor:pointer;">
                             <span id="btnServerP1Label">Tim 1</span>
                         </button>
-                        <button type="button" id="btnServerP2" onclick="setInitialServer('p2')" class="py-2 px-3 border border-slate-800 bg-slate-950 text-slate-400 font-bold rounded-xl text-xs flex items-center justify-center gap-1 truncate">
+                        <button type="button" id="btnServerP2" onclick="setInitialServer('p2')" style="padding:0.5rem; border:1px solid #334155; background:#020617; color:#94a3b8; font-weight:800; border-radius:0.6rem; cursor:pointer;">
                             <span id="btnServerP2Label">Tim 2</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-                <button onclick="closeSettingsModal()" class="px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl hover:bg-amber-400 transition text-xs">
-                    Terapkan & Simpan
-                </button>
+            <div style="display:flex; justify-content:flex-end; border-top:1px solid #1e293b; padding-top:0.75rem;">
+                <button onclick="closeSettingsModal()" style="padding:0.5rem 1.25rem; background:#f59e0b; color:#020617; font-weight:900; border-radius:0.75rem; border:none; cursor:pointer; font-size:0.75rem;">Simpan & Terapkan</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: WINNER CELEBRATION -->
-    <div id="winnerModal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-slate-900 border-2 border-amber-500/50 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl flex flex-col items-center gap-4 relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl"></div>
-            
-            <div class="w-20 h-20 bg-amber-500/10 border-2 border-amber-500/40 rounded-full flex items-center justify-center text-amber-400 animate-bounce mt-2">
-                <i data-lucide="trophy" class="w-10 h-10"></i>
+    <!-- MODAL 4: WINNER CELEBRATION -->
+    <div id="winnerModal" class="hidden" style="position:fixed; inset:0; z-index:70; background:rgba(2, 6, 23, 0.92); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:1rem;">
+        <div style="background:#0f172a; border:2px solid rgba(245, 158, 11, 0.5); width:100%; max-width:360px; border-radius:1.75rem; padding:1.5rem; text-align:center; display:flex; flex-direction:column; align-items:center; gap:1rem; box-shadow:0 25px 50px -12px rgba(245, 158, 11, 0.3);">
+            <div style="width:72px; height:72px; background:rgba(245, 158, 11, 0.12); border:2px solid rgba(245, 158, 11, 0.4); border-radius:999px; display:flex; align-items:center; justify-content:center; color:#fbbf24;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
             </div>
 
             <div>
-                <span class="text-xs font-bold uppercase tracking-widest text-amber-400">PEMENANG PERTANDINGAN</span>
-                <h2 id="winnerName" class="text-3xl font-black text-white mt-1">Tim 1</h2>
+                <span style="font-size:0.65rem; font-weight:900; letter-spacing:2px; color:#fbbf24; text-transform:uppercase;">PEMENANG PERTANDINGAN</span>
+                <h2 id="winnerName" style="font-size:1.75rem; font-weight:900; color:#ffffff; margin-top:0.2rem;">Tim 1</h2>
             </div>
 
-            <div id="winnerScoreDetail" class="bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2 w-full text-sm font-semibold text-slate-300">
+            <div id="winnerScoreDetail" style="background:#020617; border:1px solid #1e293b; border-radius:1rem; padding:0.5rem 1rem; width:100%; font-size:0.8rem; font-weight:700; color:#cbd5e1;">
                 Skor Set: 2 - 1
             </div>
 
-            <button onclick="restartMatchAfterWin()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black rounded-2xl shadow-lg transition active:scale-95 text-sm uppercase tracking-wider">
+            <button onclick="restartMatchAfterWin()" style="width:100%; padding:0.75rem; background:linear-gradient(to right, #f59e0b, #d97706); color:#020617; font-weight:900; border-radius:1rem; border:none; cursor:pointer; font-size:0.85rem; letter-spacing:1px; text-transform:uppercase; box-shadow:0 10px 20px rgba(245, 158, 11, 0.3);">
                 Main Lagi
             </button>
         </div>
     </div>
 
-    <!-- MODAL: HISTORY -->
-    <div id="historyModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[85vh]">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="history" class="w-5 h-5 text-indigo-400"></i>
-                    <h3 class="font-bold text-lg text-white">Riwayat Pertandingan</h3>
-                </div>
-                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- MODAL 5: MATCH HISTORY -->
+    <div id="historyModal" class="hidden" style="position:fixed; inset:0; z-index:60; background:rgba(2, 6, 23, 0.85); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:1rem;">
+        <div style="background:#0f172a; border:1px solid #1e293b; width:100%; max-width:480px; border-radius:1.5rem; padding:1.25rem; display:flex; flex-direction:column; gap:0.875rem; max-height:85vh;">
+            <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #1e293b; padding-bottom:0.75rem;">
+                <h3 style="font-weight:800; font-size:1.1rem; color:#ffffff;">Riwayat Pertandingan</h3>
+                <button onclick="closeHistoryModal()" style="background:none; border:none; color:#94a3b8; cursor:pointer;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
-            <div id="historyListContainer" class="flex-1 overflow-y-auto space-y-2 pr-1">
-                <div class="text-center text-slate-500 text-sm py-8">Belum ada riwayat tersimpan</div>
+            <div id="historyListContainer" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem; padding-right:0.25rem;">
+                <div style="text-align:center; color:#64748b; font-size:0.8rem; padding:2rem 0;">Belum ada riwayat tersimpan</div>
             </div>
 
-            <div class="flex justify-between items-center pt-2 border-t border-slate-800">
-                <button onclick="clearHistory()" class="px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 text-xs font-bold transition">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #1e293b; padding-top:0.75rem;">
+                <button onclick="clearHistory()" style="padding:0.4rem 0.75rem; background:rgba(239, 68, 68, 0.12); color:#f87171; border:1px solid rgba(239, 68, 68, 0.2); border-radius:0.75rem; font-size:0.7rem; font-weight:800; cursor:pointer;">
                     Hapus Riwayat
                 </button>
-                <button onclick="closeHistoryModal()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold rounded-xl hover:bg-slate-700 transition text-xs">
+                <button onclick="closeHistoryModal()" style="padding:0.4rem 1rem; background:#1e293b; color:#cbd5e1; font-weight:800; border-radius:0.75rem; border:none; cursor:pointer; font-size:0.75rem;">
                     Tutup
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- APPLICATION LOGIC JavaScript -->
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
     <script>
+        // CORE STATE STRUCTURE
         let state = {
             sport: 'badminton',
             targetPoints: 21,
@@ -459,7 +483,7 @@
             29: 'Dua puluh sembilan', 30: 'Tiga puluh'
         };
 
-        // AUDIO SYNTHESIZER FOR WHISTLE
+        // 1. OFFLINE WEB AUDIO SYNTHESIZER FOR REALISTIC WHISTLE
         let audioCtx = null;
         let whistleOsc1 = null;
         let whistleOsc2 = null;
@@ -489,8 +513,9 @@
                 whistleOsc1.type = 'sine';
                 whistleOsc2.type = 'triangle';
 
+                // Dual frequency whistle tone for pitch variation
                 whistleOsc1.frequency.setValueAtTime(2800, ctx.currentTime);
-                whistleOsc2.frequency.setValueAtTime(3000, ctx.currentTime);
+                whistleOsc2.frequency.setValueAtTime(3050, ctx.currentTime);
 
                 whistleGain.gain.setValueAtTime(0, ctx.currentTime);
                 whistleGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.04);
@@ -502,9 +527,9 @@
                 whistleOsc1.start();
                 whistleOsc2.start();
 
-                document.getElementById('btnWhistle').classList.add('bg-amber-500/40', 'scale-95');
+                document.getElementById('btnWhistle').style.background = 'rgba(245, 158, 11, 0.4)';
             } catch (e) {
-                console.error("Whistle error:", e);
+                console.error("Whistle audio error:", e);
             }
         }
 
@@ -523,13 +548,13 @@
                     isWhistleBlowing = false;
                 }, 50);
 
-                document.getElementById('btnWhistle').classList.remove('bg-amber-500/40', 'scale-95');
+                document.getElementById('btnWhistle').style.background = 'rgba(245, 158, 11, 0.12)';
             } catch (e) {
                 console.error("Whistle stop error:", e);
             }
         }
 
-        // TEXT TO SPEECH (TTS) ANNOUNCEMENTS
+        // 2. NATIVE OFFLINE TTS ANNOUNCEMENTS
         function speakText(text) {
             if (!state.ttsEnabled) return;
             if ('speechSynthesis' in window) {
@@ -545,22 +570,23 @@
         function toggleTTS() {
             state.ttsEnabled = !state.ttsEnabled;
             const btn = document.getElementById('btnTTS');
-            const icon = document.getElementById('ttsIcon');
             const label = document.getElementById('ttsLabel');
 
             if (state.ttsEnabled) {
-                btn.className = "px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-xl transition flex items-center gap-1.5 active:scale-95";
-                icon.setAttribute('data-lucide', 'megaphone');
+                btn.style.background = "rgba(16, 185, 129, 0.12)";
+                btn.style.color = "#34d399";
+                btn.style.borderColor = "rgba(16, 185, 129, 0.3)";
                 label.innerText = "Suara: ON";
                 speakText("Suara diaktifkan");
             } else {
-                btn.className = "px-3 py-1.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl transition flex items-center gap-1.5 active:scale-95";
-                icon.setAttribute('data-lucide', 'volume-x');
+                btn.style.background = "#1e293b";
+                btn.style.color = "#94a3b8";
+                btn.style.borderColor = "#334155";
                 label.innerText = "Suara: OFF";
             }
-            lucide.createIcons();
         }
 
+        // 3. GAME SNAPSHOT & UNDO
         function saveSnapshot() {
             state.undoStack.push(JSON.parse(JSON.stringify({
                 currentSet: state.currentSet,
@@ -613,7 +639,7 @@
             }
         }
 
-        // TTS: ALWAYS ANNOUNCE SERVING PLAYER'S SCORE FIRST
+        // REQUIREMENT: TTS ALWAYS ANNOUNCES SERVING PLAYER FIRST
         function announceScore() {
             const serverKey = state.server;
             const receiverKey = serverKey === 'p1' ? 'p2' : 'p1';
@@ -627,7 +653,7 @@
             if (serverScore === receiverScore) {
                 speakText(`${serverScoreText} sama`);
             } else {
-                // Score of current server is spoken first!
+                // Score of server is spoken FIRST!
                 speakText(`${serverScoreText}, ${receiverScoreText}`);
             }
         }
@@ -672,7 +698,7 @@
             state.setHistory.push({ p1: state.p1.score, p2: state.p2.score });
 
             startWhistle();
-            setTimeout(stopWhistle, 350);
+            setTimeout(stopWhistle, 400);
 
             const winnerName = state[winner].name;
             speakText(`Set dimenangkan oleh ${winnerName}`);
@@ -748,7 +774,8 @@
 
         function updateUndoButton() {
             const btn = document.getElementById('btnUndo');
-            btn.disabled = state.undoStack.length === 0;
+            btn.style.opacity = state.undoStack.length === 0 ? "0.4" : "1";
+            btn.style.cursor = state.undoStack.length === 0 ? "not-allowed" : "pointer";
         }
 
         function switchSport(sport) {
@@ -760,17 +787,29 @@
             if (sport === 'badminton') {
                 state.targetPoints = 21;
                 state.maxSets = 3;
-                bBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-900/40";
-                ttBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
-                cardP1.className = "score-card bg-slate-900/90 border-2 border-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-4 flex flex-col justify-between relative overflow-hidden glow-emerald";
+                bBtn.style.background = "#059669";
+                bBtn.style.color = "#ffffff";
+                bBtn.style.boxShadow = "0 4px 12px rgba(5,150,105,0.3)";
+                
+                ttBtn.style.background = "transparent";
+                ttBtn.style.color = "#94a3b8";
+                ttBtn.style.boxShadow = "none";
+
+                cardP1.className = "score-card glow-emerald";
                 document.getElementById('p1PositionHint').classList.remove('hidden');
                 document.getElementById('p2PositionHint').classList.remove('hidden');
             } else {
                 state.targetPoints = 11;
                 state.maxSets = 5;
-                ttBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-red-600 text-white shadow-lg shadow-red-900/40";
-                bBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
-                cardP1.className = "score-card bg-slate-900/90 border-2 border-slate-800 rounded-2xl md:rounded-3xl p-3 md:p-4 flex flex-col justify-between relative overflow-hidden glow-red";
+                ttBtn.style.background = "#dc2626";
+                ttBtn.style.color = "#ffffff";
+                ttBtn.style.boxShadow = "0 4px 12px rgba(220,38,38,0.3)";
+
+                bBtn.style.background = "transparent";
+                bBtn.style.color = "#94a3b8";
+                bBtn.style.boxShadow = "none";
+
+                cardP1.className = "score-card glow-red";
                 document.getElementById('p1PositionHint').classList.add('hidden');
                 document.getElementById('p2PositionHint').classList.add('hidden');
             }
@@ -791,7 +830,7 @@
             updateUI();
         }
 
-        // EDIT TEAM NAMES VIA POPUP MODAL
+        // 4. EDIT TEAM NAMES VIA POPUP MODAL
         function openNameEditModal(playerKey) {
             state.editingPlayerKey = playerKey;
             const currentName = state[playerKey].name;
@@ -821,9 +860,8 @@
             closeNameEditModal();
         }
 
-        // RENDER & UPDATE UI
+        // 5. UPDATE BOARD UI
         function updateUI() {
-            // Player Names & Scores
             document.getElementById('p1Name').innerText = state.p1.name;
             document.getElementById('p2Name').innerText = state.p2.name;
             document.getElementById('p1Score').innerText = state.p1.score;
@@ -831,7 +869,6 @@
             document.getElementById('p1Sets').innerText = state.p1.setsWon;
             document.getElementById('p2Sets').innerText = state.p2.setsWon;
 
-            // Set & Match Labels
             document.getElementById('currentSetLabel').innerText = state.currentSet;
             document.getElementById('matchRuleLabel').innerText = `Best of ${state.maxSets} (${state.targetPoints} Poin)`;
 
@@ -864,28 +901,27 @@
             if (diff === 0) {
                 p1DiffBadge.innerText = 'SELISIH: 0';
                 p2DiffBadge.innerText = 'SELISIH: 0';
-                p1DiffBadge.className = "text-xs font-extrabold px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400";
-                p2DiffBadge.className = "text-xs font-extrabold px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400";
+                p1DiffBadge.style.color = '#94a3b8';
+                p2DiffBadge.style.color = '#94a3b8';
                 leadText.innerText = 'SKOR SERI (0)';
-                leadText.className = 'text-slate-300 font-black';
+                leadText.style.color = '#cbd5e1';
             } else if (diff > 0) {
                 p1DiffBadge.innerText = `UNGGUL +${diff}`;
                 p2DiffBadge.innerText = `TERTINGGAL -${diff}`;
-                p1DiffBadge.className = "text-xs font-extrabold px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-400";
-                p2DiffBadge.className = "text-xs font-extrabold px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400";
+                p1DiffBadge.style.color = '#34d399';
+                p2DiffBadge.style.color = '#f87171';
                 leadText.innerText = `${state.p1.name.toUpperCase()} UNGGUL +${diff}`;
-                leadText.className = 'text-emerald-400 font-black';
+                leadText.style.color = '#34d399';
             } else {
                 const absDiff = Math.abs(diff);
                 p1DiffBadge.innerText = `TERTINGGAL -${absDiff}`;
                 p2DiffBadge.innerText = `UNGGUL +${absDiff}`;
-                p1DiffBadge.className = "text-xs font-extrabold px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400";
-                p2DiffBadge.className = "text-xs font-extrabold px-2.5 py-1 rounded-lg bg-indigo-500/20 border border-indigo-500/40 text-indigo-400";
+                p1DiffBadge.style.color = '#f87171';
+                p2DiffBadge.style.color = '#818cf8';
                 leadText.innerText = `${state.p2.name.toUpperCase()} UNGGUL +${absDiff}`;
-                leadText.className = 'text-indigo-400 font-black';
+                leadText.style.color = '#818cf8';
             }
 
-            // Update settings team label buttons
             document.getElementById('btnServerP1Label').innerText = state.p1.name;
             document.getElementById('btnServerP2Label').innerText = state.p2.name;
 
@@ -928,11 +964,21 @@
             const b2 = document.getElementById('btnServerP2');
 
             if (player === 'p1') {
-                b1.className = "py-2 px-3 border border-amber-500 bg-amber-500/10 text-amber-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1 truncate";
-                b2.className = "py-2 px-3 border border-slate-800 bg-slate-950 text-slate-400 font-bold rounded-xl text-xs flex items-center justify-center gap-1 truncate";
+                b1.style.background = "rgba(245, 158, 11, 0.15)";
+                b1.style.borderColor = "#f59e0b";
+                b1.style.color = "#fbbf24";
+
+                b2.style.background = "#020617";
+                b2.style.borderColor = "#334155";
+                b2.style.color = "#94a3b8";
             } else {
-                b2.className = "py-2 px-3 border border-amber-500 bg-amber-500/10 text-amber-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1 truncate";
-                b1.className = "py-2 px-3 border border-slate-800 bg-slate-950 text-slate-400 font-bold rounded-xl text-xs flex items-center justify-center gap-1 truncate";
+                b2.style.background = "rgba(245, 158, 11, 0.15)";
+                b2.style.borderColor = "#f59e0b";
+                b2.style.color = "#fbbf24";
+
+                b1.style.background = "#020617";
+                b1.style.borderColor = "#334155";
+                b1.style.color = "#94a3b8";
             }
             updateUI();
         }
@@ -948,29 +994,29 @@
                 scores: state.setHistory.map(s => `${s.p1}-${s.p2}`).join(', ')
             };
 
-            let history = JSON.parse(localStorage.getItem('scoreboard_history') || '[]');
+            let history = JSON.parse(localStorage.getItem('pwa_scoreboard_history') || '[]');
             history.unshift(record);
-            localStorage.setItem('scoreboard_history', JSON.stringify(history));
+            localStorage.setItem('pwa_scoreboard_history', JSON.stringify(history));
         }
 
         function openHistoryModal() {
             const historyListContainer = document.getElementById('historyListContainer');
-            let history = JSON.parse(localStorage.getItem('scoreboard_history') || '[]');
+            let history = JSON.parse(localStorage.getItem('pwa_scoreboard_history') || '[]');
 
             if (history.length === 0) {
-                historyListContainer.innerHTML = `<div class="text-center text-slate-500 text-sm py-8">Belum ada riwayat pertandingan tersimpan</div>`;
+                historyListContainer.innerHTML = `<div style="text-align:center; color:#64748b; font-size:0.8rem; padding:2rem 0;">Belum ada riwayat pertandingan tersimpan</div>`;
             } else {
                 historyListContainer.innerHTML = history.map(item => `
-                    <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl flex flex-col gap-1 text-xs">
-                        <div class="flex items-center justify-between text-slate-400">
-                            <span class="font-bold text-amber-400 uppercase tracking-wider">${item.sport}</span>
+                    <div style="background:#020617; border:1px solid #1e293b; padding:0.6rem 0.8rem; border-radius:0.875rem; display:flex; flex-direction:column; gap:0.2rem; font-size:0.75rem;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; color:#94a3b8;">
+                            <span style="font-weight:900; color:#fbbf24; text-transform:uppercase;">${item.sport}</span>
                             <span>${item.date}</span>
                         </div>
-                        <div class="flex items-center justify-between text-white font-bold text-sm">
+                        <div style="display:flex; align-items:center; justify-content:space-between; color:#ffffff; font-weight:800;">
                             <span>${item.p1} vs ${item.p2}</span>
-                            <span class="text-emerald-400">Pemenang: ${item.winner}</span>
+                            <span style="color:#34d399;">Menang: ${item.winner}</span>
                         </div>
-                        <div class="text-slate-400">Skor Set: ${item.scores}</div>
+                        <div style="color:#64748b; font-size:0.7rem;">Skor Set: ${item.scores}</div>
                     </div>
                 `).join('');
             }
@@ -984,7 +1030,7 @@
 
         function clearHistory() {
             if (confirm("Hapus seluruh riwayat pertandingan?")) {
-                localStorage.removeItem('scoreboard_history');
+                localStorage.removeItem('pwa_scoreboard_history');
                 openHistoryModal();
             }
         }
@@ -1001,9 +1047,68 @@
             }
         }
 
-        // EVENT LISTENERS INITIALIZATION
+        // 6. PWA OFFLINE REGISTRATION & INSTALLATION PROMPT
+        let deferredPrompt = null;
+
+        function setupPWAOfflineSupport() {
+            // Create Dynamic Inline Data Manifest
+            const manifestObj = {
+                name: "Papan Skor Badminton & Tenis Meja",
+                short_name: "Papan Skor",
+                start_url: "./",
+                display: "standalone",
+                orientation: "landscape",
+                background_color: "#020617",
+                theme_color: "#0f172a",
+                icons: [
+                    {
+                        src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 24 24' fill='%23f59e0b'><rect width='24' height='24' rx='5' fill='%230f172a'/><path d='M12 2v20M2 12h20' stroke='%23f59e0b' stroke-width='2'/></svg>",
+                        sizes: "192x192",
+                        type: "image/svg+xml"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/json' });
+            document.getElementById('manifestPlaceholder').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+            // Register Service Worker from Blob to ensure 100% offline cache capability
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'scoreboard-pwa-v1';
+                    self.addEventListener('install', (e) => {
+                        e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./'])));
+                        self.skipWaiting();
+                    });
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+            }
+
+            // Capture Android Install Prompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const btnInstall = document.getElementById('btnInstallPWA');
+                btnInstall.style.display = 'flex';
+            });
+        }
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                    document.getElementById('btnInstallPWA').style.display = 'none';
+                });
+            }
+        }
+
+        // INITIALIZE ALL EVENT LISTENERS
         window.onload = function () {
-            lucide.createIcons();
+            setupPWAOfflineSupport();
             updateUI();
 
             const whistleBtn = document.getElementById('btnWhistle');
