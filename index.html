@@ -128,6 +128,12 @@
             <!-- Header Action Controls -->
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 
+                <!-- READ SCORE BUTTON -->
+                <button onclick="readCurrentScore()" title="Baca Skor Saat Ini" style="padding:0.4rem 0.75rem; background:rgba(14, 165, 233, 0.15); color:#38bdf8; border:1px solid rgba(14, 165, 233, 0.3); border-radius:0.75rem; cursor:pointer; display:flex; align-items:center; gap:0.35rem; font-size:0.75rem; font-weight:800;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6v12M6 12h12"/></svg>
+                    <span>Baca Skor</span>
+                </button>
+
                 <!-- WHISTLE HOLD BUTTON -->
                 <button id="btnWhistle" title="Tahan untuk membunyikan peluit" style="padding:0.4rem 0.75rem; background:rgba(245, 158, 11, 0.12); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.3); border-radius:0.75rem; cursor:pointer; display:flex; align-items:center; gap:0.35rem; font-size:0.75rem; font-weight:800;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
@@ -555,8 +561,8 @@
         }
 
         // 2. NATIVE OFFLINE TTS ANNOUNCEMENTS
-        function speakText(text) {
-            if (!state.ttsEnabled) return;
+        function speakText(text, forceSpeak = false) {
+            if (!state.ttsEnabled && !forceSpeak) return;
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
@@ -577,13 +583,39 @@
                 btn.style.color = "#34d399";
                 btn.style.borderColor = "rgba(16, 185, 129, 0.3)";
                 label.innerText = "Suara: ON";
-                speakText("Suara diaktifkan");
+                speakText("Suara diaktifkan", true);
             } else {
                 btn.style.background = "#1e293b";
                 btn.style.color = "#94a3b8";
                 btn.style.borderColor = "#334155";
                 label.innerText = "Suara: OFF";
             }
+        }
+
+        // FUNGSI KHUSUS TOMBOL "BACA SKOR"
+        function readCurrentScore() {
+            const p1Name = state.p1.name;
+            const p2Name = state.p2.name;
+
+            const p1ScoreText = ttsNumbersIndonesian[state.p1.score] || state.p1.score;
+            const p2ScoreText = ttsNumbersIndonesian[state.p2.score] || state.p2.score;
+
+            const diff = state.p1.score - state.p2.score;
+            let leadStatusText = "";
+
+            if (diff === 0) {
+                leadStatusText = "skor seri";
+            } else if (diff > 0) {
+                const diffText = ttsNumbersIndonesian[diff] || diff;
+                leadStatusText = `${p1Name} unggul ${diffText}`;
+            } else {
+                const absDiff = Math.abs(diff);
+                const diffText = ttsNumbersIndonesian[absDiff] || absDiff;
+                leadStatusText = `${p2Name} unggul ${diffText}`;
+            }
+
+            // Membaca skor tanpa bergantung pada status toggle TTS
+            speakText(`${p1Name} ${p1ScoreText}, ${p2Name} ${p2ScoreText}, ${leadStatusText}`, true);
         }
 
         // 3. GAME SNAPSHOT & UNDO
@@ -639,7 +671,6 @@
             }
         }
 
-        // REQUIREMENT: TTS ALWAYS ANNOUNCES SERVING PLAYER FIRST
         function announceScore() {
             const serverKey = state.server;
             const receiverKey = serverKey === 'p1' ? 'p2' : 'p1';
@@ -653,7 +684,6 @@
             if (serverScore === receiverScore) {
                 speakText(`${serverScoreText} sama`);
             } else {
-                // Score of server is spoken FIRST!
                 speakText(`${serverScoreText}, ${receiverScoreText}`);
             }
         }
